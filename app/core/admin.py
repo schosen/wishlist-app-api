@@ -14,7 +14,8 @@ class UserAdmin(BaseUserAdmin):
     list_display = ['email', 'first_name', 'last_name', 'uuid']
     fieldsets = (
         (None, {'fields': ('email', 'password',)}),
-        (_('Personal Info'),
+        (
+            _('Personal Info'),
             {
                 'fields': (
                     'first_name',
@@ -54,8 +55,6 @@ class UserAdmin(BaseUserAdmin):
             ),
         }),
     )
-
-
 
 
 admin.site.register(models.User, UserAdmin)
