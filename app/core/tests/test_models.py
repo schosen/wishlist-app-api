@@ -4,6 +4,9 @@ Test for models.
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+# from decimal import Decimal
+import datetime
+from core import models
 
 
 class ModelTests(TestCase):
@@ -47,3 +50,19 @@ class ModelTests(TestCase):
 
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_create_wishlist(self):
+        """Test creating a wishlist is successful."""
+        user = get_user_model().objects.create_user(
+            'test@example.com',
+            'test123',
+        )
+        wishlist = models.Wishlist.objects.create(
+            user=user,
+            title='Sample wishlist',
+            description='this is a test wishlist description',
+            occation_date= datetime.date.now(),
+            address='123 Sample Street, Sampleland, 12QW 6ER',
+        )
+
+        self.assertEqual(str(wishlist), wishlist.title)
