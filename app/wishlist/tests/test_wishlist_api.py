@@ -12,10 +12,20 @@ from rest_framework.test import APIClient
 
 from core.models import Wishlist
 
-from wishlist.serializers import WishlistSerializer
+from wishlist.serializers import (
+    WishlistSerializer,
+    WishlistDetailSerializer,
+    # WishlistItemSerializer,
+    # WishlistItemDetailSerializer,
 
+)
 
 WISHLIST_URL = reverse('wishlist:wishlist-list')
+
+
+def wishlist_detail_url(wishlist_id):
+    """Create and return a wishlist detail URL."""
+    return reverse('wishlist:wishlist-detail', args=[wishlist_id])
 
 
 def create_wishlist(user, **params):
@@ -82,6 +92,17 @@ class PrivateWishlistApiTests(TestCase):
         wishlist = Wishlist.objects.filter(user=self.user)
         serializer = WishlistSerializer(wishlist, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_get_wishlist_detail(self):
+        """Test get wishlist detail."""
+        wishlist = create_wishlist(user=self.user)
+        # need to have create item here
+
+        url = wishlist_detail_url(wishlist.id)
+        res = self.client.get(url)
+
+        serializer = WishlistDetailSerializer(wishlist)
         self.assertEqual(res.data, serializer.data)
 
 # "TO-DO: CREATE API FOR USER TO DELETE ALL WISHLISTS"
