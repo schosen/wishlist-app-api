@@ -61,7 +61,7 @@ class ModelTests(TestCase):
             user=user,
             title='Sample wishlist',
             description='this is a test wishlist description',
-            occation_date= datetime.date.now(),
+            occasion_date= datetime.date(year=2020, month=1, day=1),
             address='123 Sample Street, Sampleland, 12QW 6ER',
         )
 
