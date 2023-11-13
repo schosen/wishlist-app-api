@@ -11,7 +11,7 @@ from wishlist import serializers
 
 class WishlistViewSet(viewsets.ModelViewSet):
     """View for manage wishlist APIs."""
-    serializer_class = serializers.WishlistSerializer
+    serializer_class = serializers.WishlistDetailSerializer
     queryset = Wishlist.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -19,3 +19,10 @@ class WishlistViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Retrieve wishlists for authenticated user."""
         return self.queryset.filter(user=self.request.user).order_by('-id')
+
+    def get_serializer_class(self):
+        """Return the serializer class for request."""
+        if self.action == 'list':
+            return serializers.WishlistSerializer
+
+        return self.serializer_class
