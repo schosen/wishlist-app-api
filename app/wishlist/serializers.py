@@ -18,5 +18,5 @@ class WishlistDetailSerializer(WishlistSerializer):
     """Serializer for wishlist detail view."""
 
     class Meta(WishlistSerializer.Meta):
-        # todo: this should have a list of wishlist items
+        # TO-DO: this should have a list of wishlist items
         fields = WishlistSerializer.Meta.fields + ['description']

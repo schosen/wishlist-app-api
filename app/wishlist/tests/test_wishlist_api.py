@@ -1,5 +1,5 @@
 """
-Tests for recipe APIs.
+Tests for wishlist APIs.
 """
 import datetime
 
@@ -104,5 +104,21 @@ class PrivateWishlistApiTests(TestCase):
 
         serializer = WishlistDetailSerializer(wishlist)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_wishlist(self):
+        """Test creating a wishlist."""
+        payload = {
+            'title': 'Sample wishlist',
+            'description': 'Sample description',
+            'occasion_date': datetime.date(year=2020, month=1, day=1),
+            'address': '123 Sample Street, Sampleland, 12QW 6ER'
+        }
+        res = self.client.post(WISHLIST_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        wishlist = Wishlist.objects.get(id=res.data['id'])
+        for k, v in payload.items():
+            self.assertEqual(getattr(wishlist, k), v)
+        self.assertEqual(wishlist.user, self.user)
 
 # "TO-DO: CREATE API FOR USER TO DELETE ALL WISHLISTS"

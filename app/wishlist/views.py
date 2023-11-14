@@ -26,3 +26,7 @@ class WishlistViewSet(viewsets.ModelViewSet):
             return serializers.WishlistSerializer
 
         return self.serializer_class
+
+    def perform_create(self, serializer):
+        """Create a new wishlist."""
+        serializer.save(user=self.request.user)
