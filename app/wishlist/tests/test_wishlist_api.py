@@ -41,6 +41,10 @@ def create_wishlist(user, **params):
     wishlist = Wishlist.objects.create(user=user, **defaults)
     return wishlist
 
+def create_user(**params):
+    """Create and return a new user."""
+    return get_user_model().objects.create_user(**params)
+
 
 class PublicWishlistAPITests(TestCase):
     """Test unauthenticated API requests."""
@@ -60,10 +64,7 @@ class PrivateWishlistApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            'user@example.com',
-            'testpass123',
-        )
+        self.user = create_user(email='user@example.com', password='test123')
         self.client.force_authenticate(self.user)
 
     def test_retrieve_wishlist(self):
@@ -80,10 +81,8 @@ class PrivateWishlistApiTests(TestCase):
 
     def test_wishlist_list_limited_to_user(self):
         """Test list of wishlist is limited to authenticated user."""
-        other_user = get_user_model().objects.create_user(
-            'other@example.com',
-            'password123',
-        )
+        other_user = create_user(email='other@example.com', password='test123')
+
         create_wishlist(user=other_user)
         create_wishlist(user=self.user)
 
@@ -120,5 +119,82 @@ class PrivateWishlistApiTests(TestCase):
         for k, v in payload.items():
             self.assertEqual(getattr(wishlist, k), v)
         self.assertEqual(wishlist.user, self.user)
+
+    def test_partial_update(self):
+        """Test partial update of a wishlist."""
+        original_address = '123 Sample Street, Sampleland, 12QW 6ER'
+        wishlist = create_wishlist(
+            user=self.user,
+            title='Sample wishlist title',
+            occasion_date=datetime.date(year=2020, month=1, day=1),
+            address=original_address
+        )
+
+        payload = {'title': 'New wishlist title'}
+        url = wishlist_detail_url(wishlist.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        wishlist.refresh_from_db()
+        self.assertEqual(wishlist.title, payload['title'])
+        self.assertEqual(wishlist.address, original_address)
+        self.assertEqual(wishlist.user, self.user)
+
+    def test_full_update(self):
+        """Test full update of wishlist."""
+        wishlist = create_wishlist(
+            user=self.user,
+            title='Sample wishlist title',
+            address='123 Sample Street, Sampleland, 12QW 6ER',
+            description='Sample wishlist description.',
+        )
+
+        payload = {
+            'title': 'New wishlist title',
+            'address': '456 New Sample Street, Sampleland, 12QW 6ER',
+            'description': 'New wishlist description',
+            'occasion_date': datetime.date(year=2023, month=9, day=10)
+        }
+        url = wishlist_detail_url(wishlist.id)
+        res = self.client.put(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        wishlist.refresh_from_db()
+        for k, v in payload.items():
+            self.assertEqual(getattr(wishlist, k), v)
+        self.assertEqual(wishlist.user, self.user)
+
+    def test_update_user_returns_error(self):
+        """Test changing the wishlist user results in an error."""
+        new_user = create_user(email='user2@example.com', password='test123')
+        wishlist = create_wishlist(user=self.user)
+
+        payload = {'user': new_user.id}
+        url = wishlist_detail_url(wishlist.id)
+        self.client.patch(url, payload)
+
+        wishlist.refresh_from_db()
+        self.assertEqual(wishlist.user, self.user)
+
+    def test_delete_wishlist(self):
+        """Test deleting a wishlist successful."""
+        wishlist = create_wishlist(user=self.user)
+
+        url = wishlist_detail_url(wishlist.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Wishlist.objects.filter(id=wishlist.id).exists())
+
+    def test_wishlist_other_users_wishlist_error(self):
+        """Test trying to delete another users wishlist gives error."""
+        new_user = create_user(email='user2@example.com', password='test123')
+        wishlist = create_wishlist(user=new_user)
+
+        url = wishlist_detail_url(wishlist.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Wishlist.objects.filter(id=wishlist.id).exists())
 
 # "TO-DO: CREATE API FOR USER TO DELETE ALL WISHLISTS"
