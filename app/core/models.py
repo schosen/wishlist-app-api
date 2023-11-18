@@ -37,12 +37,23 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """User in the system."""
+
+    MALE = "M"
+    FEMALE = "F"
+    NONBINARY = "N"
+
+    GENDER_CHOICES = [
+        (MALE, "Male"),
+        (FEMALE, "Female"),
+        (NONBINARY, "Non Binary")
+    ]
+
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    last_name = models.CharField(max_length=255)
-    gender = models.CharField(max_length=255)
-    birthday = models.DateField(null=True)
+    last_name = models.CharField(max_length=255, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
+    birthday = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -58,8 +69,8 @@ class Wishlist(models.Model):
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    occasion_date = models.DateField()
-    address = models.CharField(max_length=255)
+    occasion_date = models.DateField(blank=True)
+    address = models.CharField(max_length=255, blank=True)
     # link = models.CharField(max_length=255, blank=True)
 
     def __str__(self):

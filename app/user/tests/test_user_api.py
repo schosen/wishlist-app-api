@@ -39,6 +39,17 @@ class PublicUserApiTests(TestCase):
         self.assertTrue(user.check_password(payload['password']))
         self.assertNotIn('password', res.data)
 
+    def test_create_user_without_name_failure(self):
+        """Test creating a user is fails when you don't add name."""
+        payload = {
+            'email': 'test@example.com',
+            'password': 'testpass123',
+        }
+        res = self.client.post(CREATE_USER_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
     def test_user_with_email_exists_error(self):
         """Test error returned if user with email exists."""
         payload = {
@@ -69,7 +80,7 @@ class PublicUserApiTests(TestCase):
     def test_create_token_for_user(self):
         """Test generates token for valid credentials."""
         user_details = {
-            'first_name': 'test',
+            # 'first_name': 'test',
             'email': 'test@example.com',
             'password': 'test-user-password123',
         }
@@ -125,6 +136,10 @@ class PrivateUserApiTests(TestCase):
             email='test@example.com',
             password='testpass123',
             first_name='Test Name',
+            last_name='Last Name',
+            gender='female',
+            birthday="2023-11-15",
+
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -137,6 +152,9 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(res.data, {
             'first_name': self.user.first_name,
             'email': self.user.email,
+            'last_name': self.user.last_name,
+            'gender': self.user.gender,
+            'birthday': self.user.birthday
         })
 
     def test_post_me_not_allowed(self):
