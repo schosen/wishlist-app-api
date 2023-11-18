@@ -4,9 +4,13 @@ Test for models.
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-# from decimal import Decimal
+from decimal import Decimal
 import datetime
 from core import models
+
+def create_user(email='user@example.com', password='testpass123'):
+    """Create a return a new user."""
+    return get_user_model().objects.create_user(email, password)
 
 
 class ModelTests(TestCase):
@@ -66,3 +70,22 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(wishlist), wishlist.title)
+
+    def test_create_product(self):
+        """Test creating an product is successful."""
+        user = create_user()
+        wishlist = models.Wishlist.objects.create(
+            user=user,
+            title='Sample wishlist',
+            description='this is a test wishlist description',
+            occasion_date= datetime.date(year=2020, month=1, day=1),
+            address='123 Sample Street, Sampleland, 12QW 6ER',
+        )
+
+        product = models.Product.objects.create(
+            wishlist=wishlist,
+            name='Product1',
+            price=Decimal('5.50')
+        )
+
+        self.assertEqual(str(product), product.name)

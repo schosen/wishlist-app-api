@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     last_name = models.CharField(max_length=255, blank=True)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
+    gender = models.CharField(max_length=255, choices=GENDER_CHOICES, blank=True)
     birthday = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -75,3 +75,31 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return self.title
+
+class Product(models.Model):
+    """Products for wishlist."""
+
+    HIGH = "HIGH"
+    MEDIUM = "MEDIUM"
+    LOW = "LOW"
+
+    PRIORITY_CHOICES = [
+        (HIGH, "High"),
+        (MEDIUM, "Medium"),
+        (LOW, "Low")
+    ]
+
+    name = models.CharField(max_length=255)
+    priority = models.CharField(max_length=6, choices=PRIORITY_CHOICES, blank=True)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    link = models.URLField(max_length=255, blank=True)
+    # image = models.ImageField(blank=True)
+    notes = models.TextField(blank=True)
+    wishlist = models.ForeignKey(
+        'Wishlist',
+        on_delete=models.CASCADE,
+    )
+
+
+    def __str__(self):
+        return self.name
