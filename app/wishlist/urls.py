@@ -1,6 +1,7 @@
 """
 URL mappings for the wishlist app.
 """
+
 from django.urls import (
     path,
     include,
@@ -13,10 +14,20 @@ from wishlist import views
 
 
 router = DefaultRouter()
-router.register('wishlists', views.WishlistViewSet)
+router.register("wishlists", views.WishlistViewSet)
 
-app_name = 'wishlist'
+app_name = "wishlist"
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
+    path(
+        "wishlists/<int:wishlist_id>/products/",
+        views.ProductViewSet.as_view(),
+        name="products",
+    ),
+    path(
+        "wishlists/<int:wishlist_id>/products/<int:product_id>/",
+        views.ProductDetailViewSet.as_view(),
+        name="product_detail",
+    ),
 ]

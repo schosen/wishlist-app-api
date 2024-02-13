@@ -60,4 +60,3 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Wishlist)
 admin.site.register(models.Product)
-

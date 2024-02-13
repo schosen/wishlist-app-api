@@ -1,6 +1,7 @@
 """
 Database models.
 """
+
 from django.conf import settings
 from django.db import models
 import uuid
@@ -18,7 +19,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """Create, save and return a new user."""
         if not email:
-            raise ValueError('User must have an email address.')
+            raise ValueError("User must have an email address.")
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -42,11 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     FEMALE = "F"
     NONBINARY = "N"
 
-    GENDER_CHOICES = [
-        (MALE, "Male"),
-        (FEMALE, "Female"),
-        (NONBINARY, "Non Binary")
-    ]
+    GENDER_CHOICES = [(MALE, "Male"), (FEMALE, "Female"), (NONBINARY, "Non Binary")]
 
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
@@ -59,10 +56,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
+
 
 class Wishlist(models.Model):
     """Wishlist object."""
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -71,10 +70,10 @@ class Wishlist(models.Model):
     description = models.TextField(blank=True)
     occasion_date = models.DateField(blank=True)
     address = models.CharField(max_length=255, blank=True)
-    # link = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.title
+
 
 class Product(models.Model):
     """Products for wishlist."""
@@ -83,23 +82,24 @@ class Product(models.Model):
     MEDIUM = "MEDIUM"
     LOW = "LOW"
 
-    PRIORITY_CHOICES = [
-        (HIGH, "High"),
-        (MEDIUM, "Medium"),
-        (LOW, "Low")
-    ]
+    PRIORITY_CHOICES = [(HIGH, "high"), (MEDIUM, "medium"), (LOW, "low")]
 
     name = models.CharField(max_length=255)
-    priority = models.CharField(max_length=6, choices=PRIORITY_CHOICES, blank=True)
+    priority = models.CharField(
+        max_length=6,
+        choices=PRIORITY_CHOICES,
+        blank=True,
+        default=PRIORITY_CHOICES[2][1],
+    )
     price = models.DecimalField(max_digits=5, decimal_places=2)
-    link = models.URLField(max_length=255, blank=True)
+    link = models.URLField(max_length=255, blank=True, null=True)
     # image = models.ImageField(blank=True)
     notes = models.TextField(blank=True)
     wishlist = models.ForeignKey(
-        'Wishlist',
+        "Wishlist",
+        related_name="products",
         on_delete=models.CASCADE,
     )
-
 
     def __str__(self):
         return self.name
