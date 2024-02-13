@@ -132,8 +132,9 @@ class PrivateWishlistApiTests(TestCase):
         url = wishlist_detail_url(wishlist.id)
         res = self.client.patch(url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        new_product = Product.objects.get(wishlist=wishlist.id,
-                                          name="Pink Top")
+        new_product = Product.objects.get(
+            wishlist=wishlist.id, name="Pink Top"
+        )
         self.assertIn(new_product, wishlist.products.all())
 
     def test_create_product_on_update_adds_to_existing_product_list(self):
@@ -156,14 +157,15 @@ class PrivateWishlistApiTests(TestCase):
         url = wishlist_detail_url(wishlist.data["id"])
         res = self.client.patch(url, update_payload, format="json")
         wishlist_products = Product.objects.filter(
-            wishlist=wishlist.data["id"])
+            wishlist=wishlist.data["id"]
+        )
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(wishlist_products.count(), 3)
         self.assertTrue(
             wishlist_products.filter(
                 name=update_payload["products"][0]["name"],
-                wishlist=wishlist.data["id"]
+                wishlist=wishlist.data["id"],
             ).exists()
         )
         for product in payload["products"]:
