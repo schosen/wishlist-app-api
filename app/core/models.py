@@ -43,13 +43,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     FEMALE = "F"
     NONBINARY = "N"
 
-    GENDER_CHOICES = [(MALE, "Male"), (FEMALE, "Female"), (NONBINARY, "Non Binary")]
+    GENDER_CHOICES = [(MALE, "Male"), (FEMALE, "Female"),
+                      (NONBINARY, "Non Binary")]
 
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     last_name = models.CharField(max_length=255, blank=True)
-    gender = models.CharField(max_length=255, choices=GENDER_CHOICES, blank=True)
+    gender = models.CharField(max_length=255,
+                              choices=GENDER_CHOICES,
+                              blank=True)
     birthday = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

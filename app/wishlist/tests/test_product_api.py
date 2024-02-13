@@ -94,7 +94,8 @@ class PrivateProductsApiTests(TestCase):
         Product.objects.create(wishlist=wishlist, name="Watch", price=100.00)
 
         wishlist = create_wishlist(user=self.user)
-        product = Product.objects.create(wishlist=wishlist, name="Jumper", price=50.00)
+        product = Product.objects.create(wishlist=wishlist,
+                                         name="Jumper", price=50.00)
 
         url = wishlist_product_url(wishlist.id)
         res = self.client.get(url)

@@ -127,4 +127,5 @@ class ProductDetailViewSet(generics.RetrieveUpdateDestroyAPIView):
                 wishlist_id=self.kwargs.get("wishlist_id"),
                 id=self.kwargs.get("product_id"),
             )
-        return get_object_or_404(self.get_queryset(), id=self.kwargs.get("product_id"))
+        return get_object_or_404(self.get_queryset(),
+                                 id=self.kwargs.get("product_id"))

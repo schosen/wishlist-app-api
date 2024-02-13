@@ -7,7 +7,10 @@ from django.urls import (
     include,
 )
 
-# default router provided by api rest framework, auto creates routes for all options (put, post, get etc)
+"""
+# default router provided by api rest framework,
+auto creates routes for all options (put, post, get etc)
+"""
 from rest_framework.routers import DefaultRouter
 
 from wishlist import views
